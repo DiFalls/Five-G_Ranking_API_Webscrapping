@@ -16,6 +16,10 @@ from bs4 import BeautifulSoup
 
 app = Flask(__name__)
 
+@app.route("/")
+def home():
+    return "API is running. Use /dados to get ranking data."
+
 # Cache simples em memória (evita scraping a cada requisição)
 cache = {"data": None, "timestamp": 0}
 
@@ -137,3 +141,4 @@ def dados():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
+
