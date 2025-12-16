@@ -20,11 +20,7 @@ app = Flask(__name__)
 cache = {"data": None, "timestamp": 0}
 
 def try_parse_json_blob(text):
-    matches = re.findall(r'(
-
-\[.*?\]
-
-)', text, re.S)
+    matches = re.findall(r'(\[.*?\])', text, re.S)
     for m in matches:
         try:
             parsed = json.loads(m)
