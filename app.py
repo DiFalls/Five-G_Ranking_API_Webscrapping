@@ -14,10 +14,7 @@ from flask_cors import CORS
 import os, time, re, requests
 
 app = Flask(__name__)
-CORS(app)  # habilita CORS para todas as rotas
-
-
-app = Flask(__name__)
+CORS(app, resources={r"/*": {"origins": "https://web.sim"}})  # habilita CORS para todas as rotas
 
 # Cache simples em memória
 cache = {"data": None, "timestamp": 0}
@@ -74,4 +71,5 @@ def dados():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
+
 
