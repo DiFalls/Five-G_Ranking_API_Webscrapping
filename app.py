@@ -1,20 +1,30 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Flask API que faz scraping do ranking em https://fiveg.schoolking.com.br/ranking/ranking.php
-e retorna os dados em JSON no endpoint /dados.
-Compatível com Render (usa variável PORT).
+Flask API que consome o ranking em https://fiveg.schoolking.com.br/ranking/ranking.php
+e retorna os dados em JSON no endpoint /dados, com nome limpo e time separado.
 """
 
 import os
 import time
+import re
 import requests
 from flask import Flask, jsonify
 
 app = Flask(__name__)
 
-# Cache simples em memória (evita scraping a cada requisição)
+# Cache simples em memória
 cache = {"data": None, "timestamp": 0}
+
+def extrair_time(nickname: str) -> str:
+    """Extrai o conteúdo entre chaves { } como 'time'."""
+    match = re.search(r"\{([^}]+)\}", nickname)
+    return match.group(1).strip() if match else "Sem Time"
+
+def limpar_nome(nickname: str) -> str:
+    """Remove símbolos de time e espaços extras, deixando apenas o apelido."""
+    nome = re.sub(r"\{.*?\}", "", nickname).strip()
+    return nome
 
 def scrape_site():
     url = "https://fiveg.schoolking.com.br/ranking/ranking.php"
@@ -27,9 +37,10 @@ def scrape_site():
 
     results = []
     for player in data:
+        nickname = player.get("nickname", "").strip()
         results.append({
-            "nome": player.get("nickname", "").strip(),
-            "time": player.get("team", ""),  # ajuste se existir campo de time
+            "nome": limpar_nome(nickname),
+            "time": extrair_time(nickname),
             "pontos": int(player.get("total_score", 0)),
             "combo": int(player.get("combo", 0))
         })
